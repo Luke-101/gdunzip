@@ -79,6 +79,59 @@ for f in gdunzip.files:
     print('Uncompressed size: ' + str(f['uncompressed_size']))
 ```
 
+for C# users
+-------------
+- Grab
+  [gdunzip.gd](https://raw.githubusercontent.com/jellehermsen/gdunzip/master/addons/gdunzip/gdunzip.gd).
+- Put gdunzip.gd somewhere in your Godot project.
+- Create a Node object with the script attached to it (e.g. Zip)
+```csharp
+
+//get the gdunzip node and so also it's script
+var gdunzip = GetNode("Zip");
+
+// Load a zip file
+bool loaded = (bool)gdunzip.Call("load", "res://a.zip");
+
+// Uncompress a file, getting a byte array in return 
+// (or false if it failed uncompressing) 
+if (loaded)
+{
+  byte[] data = (byte[])gdunzip.Call("uncompress", "lorem.txt");
+
+  if(data == null)
+    GD.Print("Failed loading zip file");
+  else
+    GD.Print(System.Text.Encoding.Default.GetString(data));
+
+  GD.Print();
+}
+else
+{
+  GD.Print("Failed loading zip file");
+}
+```
+
+- When gdunzip has loaded a zip file, you can iterate over all the files inside, by
+  looping through the "files" attribute:
+```csharp
+foreach (System.Collections.DictionaryEntry f in (Godot.Collections.Dictionary)gdunzip.Get("files"))
+{
+    GD.Print("File name: " + f.Key); //or fCasted["file_name"]
+
+    //only to not cast every time
+    Godot.Collections.Dictionary fCasted = (Godot.Collections.Dictionary)f.Value;
+
+    // "compression_method" will be either -1 for uncompressed data, or
+    // File.COMPRESSION_DEFLATE for deflate streams
+    GD.Print("Compression method: " + fCasted["compression_method"]);
+
+    GD.Print("Compressed size: " + fCasted["compressed_size"]);
+
+    GD.Print("Uncompressed size: " + fCasted["uncompressed_size"]);
+}
+```
+
 Class documentation
 -------------------
 
